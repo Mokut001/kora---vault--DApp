@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KoraVault | Decentralized Savings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #030408; color: #fff; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.05); }
+        .btn-glow { transition: all 0.3s ease; }
+        .btn-glow:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); transform: translateY(-1px); }
+        .progress-bar { transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-blue-500/30">
+
+    <!-- Background Decor -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30">
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Header -->
+    <nav class="max-w-6xl mx-auto p-8 flex justify-between items-center relative z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center rotate-3 shadow-lg shadow-blue-500/10">
+                <span class="text-2xl text-slate-900 font-extrabold">K</span>
+            </div>
+            <span class="text-xl font-black tracking-tighter">KoraVault</span>
+        </div>
+        <button id="connectBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-bold btn-glow">
+            Connect Wallet
+        </button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        
+        <!-- Welcome/Init Section -->
+        <div id="initView" class="text-center py-20 animate-in fade-in duration-1000">
+            <h2 class="text-7xl font-black mb-8 leading-[1.1] tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-500">
+                Your ADA, Locked by <br> Pure Haskell.
+            </h2>
+            <p class="text-slate-400 text-xl max-w-2xl mx-auto mb-12 font-medium">
+                Set a goal. Send ADA to your personal smart contract. The Plutus script ensures you can't touch it until your target is met.
+            </p>
+            
+            <div class="glass max-w-sm mx-auto p-12 rounded-[50px] shadow-2xl border-white/10">
+                <label class="text-[10px] font-bold text-blue-400 uppercase tracking-[0.3em] block mb-4">Savings Target (₳)</label>
+                <input type="number" id="targetInput" placeholder="0.00" class="w-full bg-slate-950 border-2 border-slate-800 rounded-3xl p-6 text-center text-4xl font-black mb-8 focus:border-blue-500 outline-none transition-all">
+                <button onclick="startDApp()" class="w-full bg-white text-slate-900 py-5 rounded-2xl font-black text-xl hover:bg-slate-100 transition shadow-xl">Deploy Smart Vault</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="hidden space-y-10 animate-in slide-in-from-bottom-10 duration-700">
+            
+            <div class="glass p-12 rounded-[60px] relative overflow-hidden group">
+                <div class="flex justify-between items-end mb-16">
+                    <div>
+                        <p class="text-slate-500 font-bold uppercase tracking-widest text-xs mb-4">Current Locked Balance</p>
+                        <h3 class="text-8xl font-black tracking-tighter"><span id="bal">0</span> <span class="text-3xl text-blue-500">₳</span></h3>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-slate-500 font-bold uppercase tracking-widest text-xs mb-4">Goal Target</p>
+                        <p class="text-4xl font-black text-slate-300">₳<span id="targ">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Progress Visual -->
+                <div class="relative pt-1">
+                    <div class="flex justify-between text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
+                        <span id="pct">0% Achieved</span>
+                        <span id="rem">₳0.00 to go</span>
+                    </div>
+                    <div class="h-6 bg-slate-900/60 rounded-full overflow-hidden border border-white/5 p-1">
+                        <div id="bar" class="progress-bar h-full bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="readyMsg" class="hidden mt-10 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl animate-pulse">
+                    <p class="text-emerald-400 font-bold text-center uppercase tracking-widest text-sm">Goal Met! Haskell Validator Check: PASSED</p>
+                </div>
+            </div>
+
+            <!-- UI Controls -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass p-10 rounded-[50px] border-t-2 border-blue-500/20">
+                    <h4 class="text-xl font-bold mb-6">Deposit ADA</h4>
+                    <div class="space-y-6">
+                        <div class="relative">
+                            <input type="number" id="depIn" placeholder="Amount" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-2xl font-bold outline-none focus:border-blue-500 transition">
+                            <span class="absolute right-5 top-6 text-slate-600 font-bold text-xs uppercase tracking-widest">Lovelace</span>
+                        </div>
+                        <button onclick="handleDep()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-blue-500 transition shadow-lg shadow-blue-900/40">Fund Vault UTxO</button>
+                    </div>
+                </div>
+
+                <div id="withdrawBox" class="glass p-10 rounded-[50px] border-t-2 border-slate-800">
+                    <h4 class="text-xl font-bold mb-6 text-slate-400">Claim Withdrawal</h4>
+                    <p class="text-sm text-slate-500 mb-8 leading-relaxed">Redemption logic is enforced by the blockchain node. Withdrawal inputs must satisfy the datum target.</p>
+                    <button id="claimBtn" disabled onclick="handleClaim()" class="w-full py-5 rounded-2xl bg-slate-900 text-slate-700 font-black text-lg cursor-not-allowed transition-all">Submit Redemption</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Full Loader Overlay -->
+    <div id="loadScreen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-3xl hidden z-50 flex flex-col items-center justify-center">
+        <div class="w-24 h-24 border-t-4 border-blue-500 rounded-full animate-spin mb-8"></div>
+        <h3 id="loadTitle" class="text-4xl font-extrabold tracking-tighter uppercase italic">Broadcasting</h3>
+        <p id="loadDesc" class="text-blue-500 font-bold uppercase tracking-[0.3em] text-[10px] mt-4 opacity-70">Awaiting Chain Confirmation</p>
+    </div>
+
+    <!-- Essential Scripts -->
+    <script src="https://unpkg.com/lucid-cardano/bundle/lucid.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
