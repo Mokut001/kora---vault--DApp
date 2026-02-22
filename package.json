@@ -1,0 +1,13 @@
+{
+  "name": "koravault-dapp",
+  "version": "1.0.0",
+  "description": "Full-stack Cardano Savings Vault",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve public",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
